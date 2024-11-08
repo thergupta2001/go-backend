@@ -3,6 +3,7 @@ package models
 import (
     "errors"
     "gorm.io/gorm"
+    "golang.org/x/crypto/bcrypt"
     "time"
 )
 
@@ -18,6 +19,13 @@ func (r *Receptionist) BeforeSave(tx *gorm.DB) (err error) {
     if r.Role == "" {
         r.Role = ReceptionistRole
     }
+
+    hashedPassword, err := bcrypt.GenerateFromPassword([]byte(r.Password), bcrypt.DefaultCost)
+    if err != nil {
+		return err
+	}
+	r.Password = string(hashedPassword)
+
     if !ValidRoles[r.Role] {
         return errors.New("invalid role")
     }

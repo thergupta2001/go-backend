@@ -1,8 +1,8 @@
-// models/doctor.go
 package models
 
 import (
     "errors"
+    "golang.org/x/crypto/bcrypt"
     "gorm.io/gorm"
     "time"
 )
@@ -15,11 +15,17 @@ type Doctor struct {
     CreatedAt time.Time
 }
 
-// Set default role and validate role
 func (d *Doctor) BeforeSave(tx *gorm.DB) (err error) {
     if d.Role == "" {
         d.Role = DoctorRole
     }
+
+    hashedPassword, err := bcrypt.GenerateFromPassword([]byte(d.Password), bcrypt.DefaultCost)
+    if err != nil {
+		return err
+	}
+	d.Password = string(hashedPassword)
+
     if !ValidRoles[d.Role] {
         return errors.New("invalid role")
     }
