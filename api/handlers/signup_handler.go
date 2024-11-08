@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
-	"net/http"
-	"strings"
 	"errors"
 	"gorm.io/gorm"
+	"net/http"
+	"strings"
 
 	"github.com/thergupta2001/go-backend.git/cmd/api"
 	"github.com/thergupta2001/go-backend.git/models"
@@ -13,6 +13,7 @@ import (
 
 type SignUpRequest struct {
 	Name     string `json:"name"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 	Role     string `json:"role"`
 }
@@ -31,7 +32,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.Name == "" || req.Password == "" || req.Role == "" {
+	if req.Name == "" || req.Password == "" || req.Role == "" || req.Email == "" {
 		http.Error(w, "All fields are required!", http.StatusBadRequest)
 		return
 	}
@@ -41,14 +42,14 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid role", http.StatusBadRequest)
 		return
 	}
-	
+
 	// Signup
 	var err error
 	switch req.Role {
 	case models.DoctorRole:
-		err = api.DB.Create(&models.Doctor{Name: req.Name, Password: req.Password, Role: req.Role}).Error
+		err = api.DB.Create(&models.Doctor{Name: req.Name, Email: req.Email, Password: req.Password, Role: req.Role}).Error
 	case models.ReceptionistRole:
-		err = api.DB.Create(&models.Receptionist{Name: req.Name, Password: req.Password, Role: req.Role}).Error
+		err = api.DB.Create(&models.Receptionist{Name: req.Name, Email: req.Email, Password: req.Password, Role: req.Role}).Error
 	}
 
 	if err != nil {

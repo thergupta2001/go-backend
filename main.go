@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/thergupta2001/go-backend.git/api/middleware"
 	"github.com/thergupta2001/go-backend.git/api/routes"
 	"github.com/thergupta2001/go-backend.git/cmd/api"
 )
@@ -29,6 +30,10 @@ func startAPIServer() {
 	})
 
 	routes.SignUpRoute(router)
+	routes.LoginRoute(router)
+
+	protected := router.PathPrefix("/protected").Subrouter()
+	protected.Use(middleware.AuthMiddleware)
 
 	log.Printf("Starting server on port %s...", port)
 	if err := http.ListenAndServe(":8080", router); err != nil {

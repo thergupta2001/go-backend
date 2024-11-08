@@ -10,11 +10,17 @@ import (
 )
 
 var DB *gorm.DB
+var JWTSecret string
 
 func SetupDB() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Error loading .env file")
+	}
+
+	JWTSecret = os.Getenv("JWT_SECRET")
+	if JWTSecret == "" {
+		log.Fatal("JWT_SECRET is not set in .env")
 	}
 
 	dsn := os.Getenv("DATABASE_URL")
